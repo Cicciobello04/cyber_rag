@@ -4,7 +4,7 @@ from langchain_chroma import Chroma
 class CyberThesisEngineV3:
     def __init__(self, threshold=0.6):
         self.embeddings = OllamaEmbeddings(model="mistral", base_url="http://10.0.2.2:11434")
-        self.db = Chroma(persist_directory="./chroma_db", embedding_function=self.embeddings)
+        self.db = Chroma(persist_directory="../chroma_db", embedding_function=self.embeddings)
         self.llm = ChatOllama(model="mistral", base_url="http://10.0.2.2:11434", temperature=0)
         self.threshold = threshold # Soglia di accettazione
 
@@ -61,4 +61,4 @@ class CyberThesisEngineV3:
         return self.llm.invoke(prompt).content
 
 engine = CyberThesisEngineV3()
-print(engine.analyze("hardcoded_creds.py"))
+print(engine.analyze("../vulnerable/hardcoded_creds.py"))

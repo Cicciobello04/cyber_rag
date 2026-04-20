@@ -5,8 +5,8 @@ from langchain_chroma import Chroma
 from langchain_ollama import OllamaEmbeddings
 
 # --- CONFIGURAZIONE ---
-CSV_FILE = 'cwe_list.csv'
-DB_DIR = './chroma_db'
+CSV_FILE = '../data/cwe_list.csv'
+DB_DIR = '../chroma_db'
 BATCH_SIZE = 50
 
 # 1. Caricamento dati (saltando le prime righe di intestazione del file MITRE)

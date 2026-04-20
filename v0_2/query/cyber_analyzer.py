@@ -4,7 +4,7 @@ from langchain_chroma import Chroma
 # Configurazione
 URL_OLLAMA = "http://10.0.2.2:11434"
 embeddings = OllamaEmbeddings(model="mistral", base_url=URL_OLLAMA)
-db = Chroma(persist_directory="./chroma_db", embedding_function=embeddings)
+db = Chroma(persist_directory="../chroma_db", embedding_function=embeddings)
 llm = ChatOllama(model="mistral", base_url=URL_OLLAMA, temperature=0.1) # Temperatura bassa = più precisione
 
 def analyze_and_predict(input_data):

@@ -6,7 +6,7 @@ class CyberThesisEngineV3:
     def __init__(self, threshold=0.7):
         self.url = "http://10.0.2.2:11434"
         self.embeddings = OllamaEmbeddings(model="mistral", base_url=self.url)
-        self.db = Chroma(persist_directory="./chroma_db", embedding_function=self.embeddings)
+        self.db = Chroma(persist_directory="../chroma_db", embedding_function=self.embeddings)
         self.llm = ChatOllama(model="mistral", base_url=self.url, temperature=0)
         self.threshold = threshold
         
@@ -74,4 +74,4 @@ class CyberThesisEngineV3:
 
 # Test
 engine = CyberThesisEngineV3(threshold=0.8) # Soglia leggermente più permissiva per il boosting
-print(engine.analyze("hardcoded_creds.py"))
+print(engine.analyze("../vulnerable/hardcoded_creds.py"))

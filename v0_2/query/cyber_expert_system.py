@@ -5,7 +5,7 @@ from langchain_chroma import Chroma
 class CyberThesisEngine:
     def __init__(self):
         self.embeddings = OllamaEmbeddings(model="mistral", base_url="http://10.0.2.2:11434")
-        self.db = Chroma(persist_directory="./chroma_db", embedding_function=self.embeddings)
+        self.db = Chroma(persist_directory="../chroma_db", embedding_function=self.embeddings)
         self.llm = ChatOllama(model="mistral", base_url="http://10.0.2.2:11434", temperature=0)
 
     def read_file(self, path):
@@ -52,6 +52,6 @@ class CyberThesisEngine:
 # Esecuzione del test
 if __name__ == "__main__":
     engine = CyberThesisEngine()
-    risultato = engine.run_analysis("vulnerable.c")
+    risultato = engine.run_analysis("../vulnerable/vulnerable.c")
     print("\n--- RISULTATO ANALISI ---")
     print(risultato)

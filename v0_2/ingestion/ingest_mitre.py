@@ -6,8 +6,8 @@ from langchain_chroma import Chroma
 from langchain_ollama import OllamaEmbeddings
 
 # --- CONFIGURAZIONE ---
-JSON_FILE = 'enterprise-attack.json'
-DB_DIR = './chroma_db'
+JSON_FILE = '../data/enterprise-attack.json'
+DB_DIR = '../chroma_db'
 BATCH_SIZE = 50 # Numero di documenti caricati per ogni step della barra
 
 # 1. Caricamento e Parsing del JSON
@@ -29,7 +29,7 @@ for obj in mitre_data['objects']:
 print(f"✅ Trovate {len(documents)} tecniche valide.")
 
 # 2. Configurazione Embeddings
-embeddings = OllamaEmbeddings(model="mistral", base_url="http://10.0.2.2:11434")
+embeddings = OllamaEmbeddings(model="bge-m3", base_url="http://10.0.2.2:11434")
 
 # 3. Creazione ChromaDB e Caricamento a blocchi con TQDM
 print(f"🚀 Inizio caricamento su ChromaDB (Batch size: {BATCH_SIZE})...")

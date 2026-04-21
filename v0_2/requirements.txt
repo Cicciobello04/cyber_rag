@@ -1,0 +1,7 @@
+fastapi==0.115.12
+python-multipart==0.0.22
+uvicorn==0.44.0
+langchain-chroma==1.1.0
+langchain-ollama==1.1.0
+requests==2.33.1
+pydantic==2.13.1

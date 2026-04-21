@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import html
 from pathlib import Path
 from typing import List
 
@@ -22,10 +23,11 @@ store = ReportStore(str(HISTORY_FILE))
 
 
 def _page(title: str, body: str) -> HTMLResponse:
+    safe_title = html.escape(title)
     html = f"""
-    <html><head><meta charset='utf-8'><title>{title}</title></head>
+    <html><head><meta charset='utf-8'><title>{safe_title}</title></head>
     <body style='font-family: Arial, sans-serif; margin: 24px;'>
-      <h1>{title}</h1>
+      <h1>{safe_title}</h1>
       <p><a href='/'>Upload</a> | <a href='/history'>Storico analisi</a></p>
       {body}
     </body></html>
@@ -84,12 +86,12 @@ async def analyze_files(
                 "status": "failed",
                 "error": str(exc),
             }
-        except Exception as exc:
+        except Exception:
             result = {
                 "analysis_id": "N/A",
                 "original_filename": uf.filename,
                 "status": "failed",
-                "error": f"Errore interno: {exc}",
+                "error": "Errore interno durante l'analisi.",
             }
 
         if isinstance(result, dict):
@@ -103,10 +105,14 @@ async def analyze_files(
     for r in results:
         link = ""
         if r.get("analysis_id") and r.get("analysis_id") != "N/A":
-            link = f" | <a href='/results/{r['analysis_id']}'>apri risultato</a>"
+            safe_aid = html.escape(str(r["analysis_id"]))
+            link = f" | <a href='/results/{safe_aid}'>apri risultato</a>"
+        safe_filename = html.escape(str(r.get("original_filename", "N/A")))
+        safe_status = html.escape(str(r.get("status", "unknown")))
+        safe_msg = html.escape(str(r.get("error", r.get("executive_summary", ""))))
         items.append(
-            f"<li><strong>{r.get('original_filename')}</strong> - {r.get('status', 'unknown')}"
-            f"{link}<br><small>{r.get('error', r.get('executive_summary', ''))}</small></li>"
+            f"<li><strong>{safe_filename}</strong> - {safe_status}"
+            f"{link}<br><small>{safe_msg}</small></li>"
         )
 
     return _page("Analisi completata", f"<ul>{''.join(items)}</ul><p><a href='/history'>Vai allo storico</a></p>")
@@ -116,26 +122,28 @@ async def analyze_files(
 async def show_result(analysis_id: str) -> HTMLResponse:
     result = store.get(analysis_id)
     if not result:
-        return _page("Risultato non trovato", f"<p>ID {analysis_id} non presente nello storico.</p>")
+        return _page("Risultato non trovato", f"<p>ID {html.escape(analysis_id)} non presente nello storico.</p>")
 
     evidence_rows = "".join(
         [
-            f"<li>{e.get('item_id')} - {e.get('name')} [{e.get('source_type')}]"
-            f" (score: {e.get('score')})</li>"
+            f"<li>{html.escape(str(e.get('item_id', 'N/A')))} - "
+            f"{html.escape(str(e.get('name', 'N/A')))} "
+            f"[{html.escape(str(e.get('source_type', 'unknown')))}]"
+            f" (score: {html.escape(str(e.get('score', 'N/A')))})</li>"
             for e in result.get("evidence", [])
         ]
     )
-    actions = "".join([f"<li>{a}</li>" for a in result.get("immediate_actions", [])])
+    actions = "".join([f"<li>{html.escape(str(a))}</li>" for a in result.get("immediate_actions", [])])
 
     body = f"""
-    <p><strong>File:</strong> {result.get('original_filename')}</p>
-    <p><strong>Tipo:</strong> {result.get('file_type')}</p>
-    <p><strong>Stato:</strong> {result.get('status')}</p>
-    <p><strong>Summary:</strong> {result.get('executive_summary')}</p>
-    <p><strong>Pattern principale:</strong> {result.get('most_likely_pattern_id')}</p>
-    <p><strong>Predizione:</strong> {result.get('predicted_next_step')}</p>
+    <p><strong>File:</strong> {html.escape(str(result.get('original_filename', 'N/A')))}</p>
+    <p><strong>Tipo:</strong> {html.escape(str(result.get('file_type', 'N/A')))}</p>
+    <p><strong>Stato:</strong> {html.escape(str(result.get('status', 'N/A')))}</p>
+    <p><strong>Summary:</strong> {html.escape(str(result.get('executive_summary', '')))}</p>
+    <p><strong>Pattern principale:</strong> {html.escape(str(result.get('most_likely_pattern_id', 'N/A')))}</p>
+    <p><strong>Predizione:</strong> {html.escape(str(result.get('predicted_next_step', '')))}</p>
     <p><strong>Azioni immediate:</strong></p><ul>{actions}</ul>
-    <p><strong>Conclusione:</strong> {result.get('raw_conclusion')}</p>
+    <p><strong>Conclusione:</strong> {html.escape(str(result.get('raw_conclusion', '')))}</p>
     <p><strong>Evidenze retrieval:</strong></p><ul>{evidence_rows}</ul>
     """
     return _page(f"Risultato {analysis_id}", body)
@@ -147,9 +155,13 @@ async def history() -> HTMLResponse:
     rows = []
     for item in items:
         aid = item.get("analysis_id", "N/A")
+        safe_aid = html.escape(str(aid))
+        safe_filename = html.escape(str(item.get("original_filename", "N/A")))
+        safe_status = html.escape(str(item.get("status", "unknown")))
+        safe_created_at = html.escape(str(item.get("created_at", "N/A")))
         rows.append(
-            f"<li><a href='/results/{aid}'>{aid}</a> - {item.get('original_filename')} - "
-            f"{item.get('status')} - {item.get('created_at')}</li>"
+            f"<li><a href='/results/{safe_aid}'>{safe_aid}</a> - {safe_filename} - "
+            f"{safe_status} - {safe_created_at}</li>"
         )
 
     return _page("Storico analisi", f"<ul>{''.join(rows) if rows else '<li>Nessuna analisi salvata.</li>'}</ul>")

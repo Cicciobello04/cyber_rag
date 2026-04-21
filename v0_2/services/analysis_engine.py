@@ -77,7 +77,7 @@ class UnifiedAnalysisEngine:
             )
         return evidence
 
-    def _prompt_for_mode(self, mode: str, input_text: str, context: str, evidence_context: str, priority: str) -> str:
+    def _prompt_for_mode(self, file_type: str, input_text: str, context: str, evidence_context: str, priority: str) -> str:
         common = f"""
 Sei un agente di Cyber Threat Intelligence e Security Analysis.
 
@@ -85,7 +85,7 @@ INPUT UTENTE:
 {input_text}
 
 CONTESTO OPERATIVO:
-- mode: {mode}
+- mode: {file_type}
 - priorita: {priority}
 - note aggiuntive: {context or 'N/A'}
 
@@ -102,9 +102,9 @@ Rispondi SOLO in JSON valido con questa struttura:
 }}
 """
 
-        if mode == "code":
+        if file_type == "code":
             return common + "\nFocus: secure coding, funzione/riga insicura, mapping CWE/MITRE e mitigazione concreta."
-        if mode in {"report", "log"}:
+        if file_type in {"report", "log"}:
             return common + "\nFocus: evento osservato, tecnica probabile, progressione attacco e containment iniziale."
         return common + "\nFocus: estrarre segnali utili e proporre una valutazione prudente."
 

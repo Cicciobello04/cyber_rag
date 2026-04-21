@@ -122,6 +122,7 @@ Rispondi SOLO in JSON valido con questa struttura:
 
         evidence = self._retrieve_evidence(uploaded.normalized_text, k=5)
         evidence_context = self._build_context(evidence)
+        # Keep input bounded to reduce prompt size and avoid context overflow across smaller local LLM setups.
         prompt = self._prompt_for_mode(uploaded.file_type, uploaded.normalized_text[:6000], context, evidence_context, priority)
 
         try:

@@ -15,7 +15,7 @@ Interfaccia web per caricare codice/report/log, analizzare i contenuti con retri
 Dal root repository:
 
 ```bash
-pip install -r /home/runner/work/cyber_rag/cyber_rag/v0_2/requirements.txt
+pip install -r v0_2/requirements.txt
 python -m uvicorn v0_2.ui.app:app --host 0.0.0.0 --port 8000
 ```
 

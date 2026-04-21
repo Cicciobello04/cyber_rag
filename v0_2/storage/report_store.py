@@ -13,7 +13,12 @@ class ReportStore:
             self.history_file.write_text("[]", encoding="utf-8")
 
     def _read(self) -> List[Dict[str, Any]]:
-        return json.loads(self.history_file.read_text(encoding="utf-8"))
+        try:
+            return json.loads(self.history_file.read_text(encoding="utf-8"))
+        except json.JSONDecodeError as exc:
+            raise ValueError(
+                f"Storico analisi corrotto: {self.history_file}. Ripristina un JSON valido."
+            ) from exc
 
     def _write(self, items: List[Dict[str, Any]]) -> None:
         self.history_file.write_text(json.dumps(items, ensure_ascii=False, indent=2), encoding="utf-8")

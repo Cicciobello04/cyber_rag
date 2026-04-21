@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import os
 from typing import List
 from uuid import uuid4
@@ -31,6 +32,7 @@ class UnifiedAnalysisEngine:
         self._embeddings = None
         self._db = None
         self._llm = None
+        self._logger = logging.getLogger(__name__)
 
     def check_ollama(self, timeout_sec: int = 3) -> None:
         try:
@@ -141,7 +143,8 @@ Rispondi SOLO in JSON valido con questa struttura:
                 raw_conclusion=payload.get("raw_conclusion", response),
                 evidence=evidence,
             )
-        except Exception:
+        except Exception as exc:
+            self._logger.exception("Errore durante l'analisi unificata")
             return AnalysisResult(
                 analysis_id=uuid4().hex,
                 original_filename=uploaded.original_filename,

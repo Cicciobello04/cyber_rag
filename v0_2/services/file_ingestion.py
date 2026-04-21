@@ -49,8 +49,10 @@ class FileIngestionService:
         suffix = Path(safe_name).suffix.lower()
 
         if suffix not in SUPPORTED_EXTENSIONS:
+            supported = ", ".join(sorted(SUPPORTED_EXTENSIONS))
             raise FileIngestionError(
-                f"Formato non supportato: {suffix or 'senza estensione'}. Converti il file in un formato testuale supportato."
+                f"Formato non supportato: {suffix or 'senza estensione'}. "
+                f"Formati supportati: {supported}."
             )
 
         raw = await upload_file.read()
